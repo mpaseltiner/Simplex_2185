@@ -350,9 +350,9 @@ void MyMesh::GenerateCylinder(float a_fRadius, float a_fHeight, int a_nSubdivisi
 		AddTri(topSecondPoint, topFirstPoint, topCenter);
 
 		//add sides
-		//AddTri(bottomFirstPoint, bottomSecondPoint, topFirstPoint);
-		//AddTri(bottomSecondPoint, topSecondPoint, topFirstPoint);
-		AddQuad(topFirstPoint, topSecondPoint, bottomFirstPoint, bottomSecondPoint);
+		AddTri(topFirstPoint, bottomSecondPoint, bottomFirstPoint);
+		AddTri(topFirstPoint, topSecondPoint, bottomSecondPoint);
+		//AddQuad(topFirstPoint, topSecondPoint, bottomFirstPoint, bottomSecondPoint);
 
 
 		currentAngle += angle;
@@ -415,18 +415,20 @@ void MyMesh::GenerateTube(float a_fOuterRadius, float a_fInnerRadius, float a_fH
 		vector3 topFourthPoint = (vector3(x2, a_fHeight / 2, y2) * a_fInnerRadius);
 
 		//bottom quad
-		AddQuad(bottomFirstPoint, bottomSecondPoint, bottomThirdPoint, bottomFourthPoint);
+		AddTri(bottomFirstPoint, bottomSecondPoint, bottomThirdPoint);
+		AddTri(bottomSecondPoint, bottomFourthPoint, bottomThirdPoint);
 
 		//top quad
-		//AddQuad(topFirstPoint, topSecondPoint, topFourthPoint, topThirdPoint);
-		AddQuad(topThirdPoint, topFourthPoint, topFirstPoint, topSecondPoint);
+		AddTri(topThirdPoint, topSecondPoint, topFirstPoint);
+		AddTri(topThirdPoint, topFourthPoint, topSecondPoint);
 
 		//outer side
-		AddQuad(topFirstPoint, topSecondPoint, bottomFirstPoint, bottomSecondPoint);
+		AddTri(topFirstPoint, bottomSecondPoint, bottomFirstPoint);
+		AddTri(topFirstPoint, topSecondPoint, bottomSecondPoint);
 
 		//inner side
-		AddQuad(bottomThirdPoint, bottomFourthPoint, topThirdPoint, topFourthPoint);
-
+		AddTri(bottomThirdPoint, bottomFourthPoint, topThirdPoint);
+		AddTri(bottomFourthPoint, topFourthPoint, topThirdPoint);
 
 		currentAngle += angle;
 		nextAngle += angle;
@@ -485,34 +487,83 @@ void MyMesh::GenerateSphere(float a_fRadius, int a_nSubdivisions, vector3 a_v3Co
 	Release();
 	Init();
 
-	float x, y, z, xy; //vertex coordinates
+	float x, y, z; //vertex coordinates
 
-	float sectorStep = 2 * PI / a_nSubdivisions;
-	float stackStep = PI / a_nSubdivisions;
-	float sectorAngle, stackAngle;
-	std::vector<vector3> points;
-	vector3 vertex;
+	float theta = 2 * (float)PI / a_nSubdivisions;
+	float phi = (float)PI / a_nSubdivisions;
+	float currentTheta = 0;
+	float currentPhi = phi;
+	vector3 currentLayerPoints[6];
+	vector3 previousLayerPoints[6];
+	vector3 top = vector3(0, 0, a_fRadius);
+	vector3 bottom = vector3(0, 0, -a_fRadius);
+	vector3 currentPoint;
 
 	for (int r = 0; r < a_nSubdivisions; r++)
 	{
-		stackAngle = PI / 2 - r * stackStep;
-		xy = a_fRadius * glm::cos(stackAngle); //r * cos(u)
-		z = a_fRadius * glm::sin(stackAngle);  //r * sin(u)
+		//find the points for the current layer
 		for (int c = 0; c < a_nSubdivisions; c++)
 		{
-			sectorAngle = c * sectorStep;
-			x = xy * glm::cos(sectorAngle);   //r * cos(u) * cos(v)
-			y = xy * glm::sin(sectorAngle);   //r * cos(u) * sin(v)
-		}
-		vertex = vector3(x, y, z) * a_fRadius;
-		points.push_back(vertex);
-	}
+			if (r != 0)
+			{
+				previousLayerPoints[c] = currentLayerPoints[c];
+			}
+			if (r <= a_nSubdivisions - 1);
+			{
+				x = glm::sin(currentPhi) * glm::cos(currentTheta);   //r * sin(u) * cos(v)
+				y = glm::sin(currentPhi) * glm::sin(currentTheta);   //r * sin(u) * sin(v)
+				z = glm::cos(currentPhi);  //r * cos(u)
 
-	for (int x = 0; x < points.size(); x++)
-	{
-		if (x + 2 < points.size())
+				currentPoint = vector3(x, y, z) * a_fRadius;
+				currentLayerPoints[c] = currentPoint;
+			}
+			currentTheta += theta;
+		}
+		currentPhi += phi;
+
+		//add the faces for the current layer
+		for (int c = 0; c < a_nSubdivisions; c++)
 		{
-			AddTri(points[x], points[x + 1], points[x + 2]);
+			//top of the sphere
+			if (r == 0)
+			{
+				if (c == a_nSubdivisions - 1)
+				{
+					AddTri(currentLayerPoints[c], currentLayerPoints[0], top);
+				}
+				else
+				{
+					AddTri(currentLayerPoints[c], currentLayerPoints[c+1], top);
+
+				}
+			}
+			//between top and bottom layer
+			else if (r > 0 && r < a_nSubdivisions - 1)
+			{
+				if (c == a_nSubdivisions - 1)
+				{
+					AddTri(currentLayerPoints[c], currentLayerPoints[0], previousLayerPoints[c]);
+					AddTri(currentLayerPoints[0], previousLayerPoints[0], previousLayerPoints[c]);
+				}
+				else
+				{
+					AddTri(currentLayerPoints[c], currentLayerPoints[c+1], previousLayerPoints[c]);
+					AddTri(currentLayerPoints[c+1], previousLayerPoints[c+1], previousLayerPoints[c]);
+				}
+			}
+			//bottom of the sphere
+			else
+			{
+				if (c == a_nSubdivisions - 1)
+				{
+					AddTri(previousLayerPoints[c], bottom, previousLayerPoints[0]);
+				}
+				else
+				{
+					AddTri(previousLayerPoints[c], bottom, previousLayerPoints[c + 1]);
+
+				}
+			}
 		}
 	}
 
