@@ -485,9 +485,28 @@ void MyMesh::GenerateSphere(float a_fRadius, int a_nSubdivisions, vector3 a_v3Co
 	Release();
 	Init();
 
-	// Replace this with your code
-	GenerateCube(a_fRadius * 2.0f, a_v3Color);
-	// -------------------------------
+	float x, y, z, xy; //vertex coordinates
+
+	float sectorStep = 2 * PI / a_nSubdivisions;
+	float stackStep = PI / a_nSubdivisions;
+	float sectorAngle, stackAngle;
+	std::vector<vector3> points;
+	vector3 vertex;
+
+	for (int r = 0; r < a_nSubdivisions; r++)
+	{
+		stackAngle = PI / 2 - r * stackStep;
+		xy = a_fRadius * cosf(stackAngle); //r * cos(u)
+		z = a_fRadius * sinf(stackAngle);  //r * sin(u)
+		for (int c = 0; c < a_nSubdivisions; c++)
+		{
+			sectorAngle = c * sectorStep;
+			x = xy * cosf(sectorAngle);   //r * cos(u) * cos(v)
+			y = xy * sinf(sectorAngle);   //r * cos(u) * sin(v)
+		}
+		vertex = vector3(x, y, z);
+		points.push_back(vertex);
+	}
 
 	// Adding information about color
 	CompleteMesh(a_v3Color);
