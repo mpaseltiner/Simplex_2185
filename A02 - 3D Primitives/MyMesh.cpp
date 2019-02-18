@@ -496,16 +496,24 @@ void MyMesh::GenerateSphere(float a_fRadius, int a_nSubdivisions, vector3 a_v3Co
 	for (int r = 0; r < a_nSubdivisions; r++)
 	{
 		stackAngle = PI / 2 - r * stackStep;
-		xy = a_fRadius * cosf(stackAngle); //r * cos(u)
-		z = a_fRadius * sinf(stackAngle);  //r * sin(u)
+		xy = a_fRadius * glm::cos(stackAngle); //r * cos(u)
+		z = a_fRadius * glm::sin(stackAngle);  //r * sin(u)
 		for (int c = 0; c < a_nSubdivisions; c++)
 		{
 			sectorAngle = c * sectorStep;
-			x = xy * cosf(sectorAngle);   //r * cos(u) * cos(v)
-			y = xy * sinf(sectorAngle);   //r * cos(u) * sin(v)
+			x = xy * glm::cos(sectorAngle);   //r * cos(u) * cos(v)
+			y = xy * glm::sin(sectorAngle);   //r * cos(u) * sin(v)
 		}
-		vertex = vector3(x, y, z);
+		vertex = vector3(x, y, z) * a_fRadius;
 		points.push_back(vertex);
+	}
+
+	for (int x = 0; x < points.size(); x++)
+	{
+		if (x + 2 < points.size())
+		{
+			AddTri(points[x], points[x + 1], points[x + 2]);
+		}
 	}
 
 	// Adding information about color
