@@ -275,9 +275,32 @@ void MyMesh::GenerateCone(float a_fRadius, float a_fHeight, int a_nSubdivisions,
 	Release();
 	Init();
 
-	// Replace this with your code
-	GenerateCube(a_fRadius * 2.0f, a_v3Color);
-	// -------------------------------
+	float angle = (2.0f * (float)PI) / a_nSubdivisions;
+	float currentAngle = 0;
+	float nextAngle = currentAngle + angle;
+	vector3 baseCenter = vector3(0, 0, 0);
+	vector3 coneTop = vector3(0, 0, a_fHeight);
+
+	for (int x = 0; x < a_nSubdivisions; x++)
+	{
+		if (x == a_nSubdivisions - 1)
+		{
+			nextAngle = 0;
+		}
+		float x1 = glm::cos(currentAngle);
+		float x2 = glm::cos(nextAngle);
+		float y1 = glm::sin(currentAngle);
+		float y2 = glm::sin(nextAngle);
+
+		vector3 firstPoint = (vector3(x1, y1, 0) * a_fRadius);
+		vector3 secondPoint = (vector3(x2, y2, 0) * a_fRadius);
+
+		AddTri(secondPoint, firstPoint, baseCenter);
+		AddTri(coneTop, firstPoint, secondPoint);
+
+		currentAngle += angle;
+		nextAngle += angle;
+	}
 
 	// Adding information about color
 	CompleteMesh(a_v3Color);
@@ -299,9 +322,42 @@ void MyMesh::GenerateCylinder(float a_fRadius, float a_fHeight, int a_nSubdivisi
 	Release();
 	Init();
 
-	// Replace this with your code
-	GenerateCube(a_fRadius * 2.0f, a_v3Color);
-	// -------------------------------
+	float angle = (2.0f * (float)PI) / a_nSubdivisions;
+	float currentAngle = 0;
+	float nextAngle = currentAngle + angle;
+	vector3 bottomCenter = vector3(0, -(a_fHeight/2), 0);
+	vector3 topCenter = vector3(0, a_fHeight/2, 0);
+
+	for (int x = 0; x < a_nSubdivisions; x++)
+	{
+		if (x == a_nSubdivisions - 1)
+		{
+			nextAngle = 0;
+		}
+		float x1 = glm::cos(currentAngle);
+		float x2 = glm::cos(nextAngle);
+		float y1 = glm::sin(currentAngle);
+		float y2 = glm::sin(nextAngle);
+
+		vector3 bottomFirstPoint = (vector3(x1, -(a_fHeight/2), y1) * a_fRadius);
+		vector3 bottomSecondPoint = (vector3(x2, -(a_fHeight/2), y2) * a_fRadius);
+		vector3 topFirstPoint = (vector3(x1, a_fHeight/2, y1) * a_fRadius);
+		vector3 topSecondPoint = (vector3(x2, a_fHeight/2, y2) * a_fRadius);
+
+		//bottom tri
+		AddTri(bottomCenter, bottomFirstPoint, bottomSecondPoint);
+		//top tri
+		AddTri(topSecondPoint, topFirstPoint, topCenter);
+
+		//add sides
+		//AddTri(bottomFirstPoint, bottomSecondPoint, topFirstPoint);
+		//AddTri(bottomSecondPoint, topSecondPoint, topFirstPoint);
+		AddQuad(topFirstPoint, topSecondPoint, bottomFirstPoint, bottomSecondPoint);
+
+
+		currentAngle += angle;
+		nextAngle += angle;
+	}
 
 	// Adding information about color
 	CompleteMesh(a_v3Color);
@@ -329,9 +385,52 @@ void MyMesh::GenerateTube(float a_fOuterRadius, float a_fInnerRadius, float a_fH
 	Release();
 	Init();
 
-	// Replace this with your code
-	GenerateCube(a_fOuterRadius * 2.0f, a_v3Color);
-	// -------------------------------
+	float angle = (2.0f * (float)PI) / a_nSubdivisions;
+	float currentAngle = 0;
+	float nextAngle = currentAngle + angle;
+	vector3 bottomCenter = vector3(0, -(a_fHeight / 2), 0);
+	vector3 topCenter = vector3(0, a_fHeight / 2, 0);
+
+	for (int x = 0; x < a_nSubdivisions; x++)
+	{
+		if (x == a_nSubdivisions - 1)
+		{
+			nextAngle = 0;
+		}
+		float x1 = glm::cos(currentAngle);
+		float x2 = glm::cos(nextAngle);
+		float y1 = glm::sin(currentAngle);
+		float y2 = glm::sin(nextAngle);
+
+		//outer points
+		vector3 bottomFirstPoint = (vector3(x1, -(a_fHeight / 2), y1) * a_fOuterRadius);
+		vector3 bottomSecondPoint = (vector3(x2, -(a_fHeight / 2), y2) * a_fOuterRadius);
+		vector3 topFirstPoint = (vector3(x1, a_fHeight / 2, y1) * a_fOuterRadius);
+		vector3 topSecondPoint = (vector3(x2, a_fHeight / 2, y2) * a_fOuterRadius);
+
+		//innner points
+		vector3 bottomThirdPoint = (vector3(x1, -(a_fHeight / 2), y1) * a_fInnerRadius);
+		vector3 bottomFourthPoint = (vector3(x2, -(a_fHeight / 2), y2) * a_fInnerRadius);
+		vector3 topThirdPoint = (vector3(x1, a_fHeight / 2, y1) * a_fInnerRadius);
+		vector3 topFourthPoint = (vector3(x2, a_fHeight / 2, y2) * a_fInnerRadius);
+
+		//bottom quad
+		AddQuad(bottomFirstPoint, bottomSecondPoint, bottomThirdPoint, bottomFourthPoint);
+
+		//top quad
+		//AddQuad(topFirstPoint, topSecondPoint, topFourthPoint, topThirdPoint);
+		AddQuad(topThirdPoint, topFourthPoint, topFirstPoint, topSecondPoint);
+
+		//outer side
+		AddQuad(topFirstPoint, topSecondPoint, bottomFirstPoint, bottomSecondPoint);
+
+		//inner side
+		AddQuad(bottomThirdPoint, bottomFourthPoint, topThirdPoint, topFourthPoint);
+
+
+		currentAngle += angle;
+		nextAngle += angle;
+	}
 
 	// Adding information about color
 	CompleteMesh(a_v3Color);
