@@ -39,7 +39,7 @@ private:
 
 	//extra variables for LERPing
 	int currentIndex = 0;//current index in positions list
-	bool restart = false;//check for moving to next point in positions list
+	bool nextPoint = false;//check for moving to next point in positions list
 
 public:
 #pragma region Constructor / Run / Destructor

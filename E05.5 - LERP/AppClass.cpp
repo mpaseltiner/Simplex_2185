@@ -68,7 +68,7 @@ void Application::Display(void)
 
 	vector3 startPos = vector3(0.0f, 0.0f, 0.0f);
 	vector3 endPos = vector3(0.0f, 0.0f, 0.0f);
-	if (restart)
+	if (nextPoint)
 	{
 		//LERP calculation
 		startPos = m_stopsList[currentIndex];
@@ -98,18 +98,18 @@ void Application::Display(void)
 
 	if (distance < .1)
 	{
-		if (restart)
+		if (nextPoint)
 		{
-			restart = false;
+			nextPoint = false;
 		}
 		else 
 		{
 			if (currentIndex == m_stopsList.size() - 2)
 			{
 				currentIndex = 0;
-				restart = true;
+				nextPoint = true;
 			}
-			else if (!restart)
+			else if (!nextPoint)
 			{
 				currentIndex++;
 			}
