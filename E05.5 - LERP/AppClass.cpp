@@ -26,6 +26,7 @@ void Application::InitVariables(void)
 	m_stopsList.push_back(vector3(5.0f, 2.0f, -5.0f));
 
 	m_stopsList.push_back(vector3(1.0f, 3.0f, -5.0f));
+
 }
 void Application::Update(void)
 {
@@ -61,8 +62,61 @@ void Application::Display(void)
 	//your code goes here
 	v3CurrentPos = vector3(0.0f, 0.0f, 0.0f);
 	//-------------------
-	
+	float xDistance;
+	float yDistance;
+	float zDistance;
 
+	vector3 startPos = vector3(0.0f, 0.0f, 0.0f);
+	vector3 endPos = vector3(0.0f, 0.0f, 0.0f);
+	if (restart)
+	{
+		//LERP calculation
+		startPos = m_stopsList[currentIndex];
+		endPos = m_stopsList[0];
+		v3CurrentPos = (startPos + fTimer * (endPos - startPos));
+
+		//curremt x, y, z location of object
+		xDistance = m_stopsList[0].x - v3CurrentPos.x;
+		yDistance = m_stopsList[0].y - v3CurrentPos.y;
+		zDistance = m_stopsList[0].z - v3CurrentPos.z;
+	}
+	else
+	{
+		//LERP calculation
+		startPos = m_stopsList[currentIndex];
+		endPos = m_stopsList[currentIndex + 1];
+		v3CurrentPos = (startPos + fTimer * (endPos - startPos));
+
+		//curremt x, y, z location of object
+		xDistance = m_stopsList[currentIndex + 1].x - v3CurrentPos.x;
+		yDistance = m_stopsList[currentIndex + 1].y - v3CurrentPos.y;
+		zDistance = m_stopsList[currentIndex + 1].z - v3CurrentPos.z;
+	}
+	
+	//calculate distance from the point the object is LERPing to
+	float distance = sqrt(pow(xDistance, 2) + pow(yDistance, 2) + pow(zDistance, 2));
+
+	if (distance < .1)
+	{
+		if (restart)
+		{
+			restart = false;
+		}
+		else 
+		{
+			if (currentIndex == m_stopsList.size() - 2)
+			{
+				currentIndex = 0;
+				restart = true;
+			}
+			else if (!restart)
+			{
+				currentIndex++;
+			}
+		}
+		//restart timer for LERPing to next point
+		fTimer -= 1;
+	}
 
 	
 	matrix4 m4Model = glm::translate(v3CurrentPos);

@@ -37,6 +37,10 @@ private:
 	ControllerInput* m_pController[8]; //Controller
 	uint m_uActCont = 0; //Active Controller of the Application
 
+	//extra variables for LERPing
+	int currentIndex = 0;//current index in positions list
+	bool restart = false;//check for moving to next point in positions list
+
 public:
 #pragma region Constructor / Run / Destructor
 	/*
