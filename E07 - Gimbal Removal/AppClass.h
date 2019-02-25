@@ -14,11 +14,12 @@ Date: 2017/05
 
 class Application
 {
+	Simplex::Model* m_pModel = nullptr;
 	matrix4 m_m4Model = IDENTITY_M4;
 	quaternion m_qOrientation;
 	vector3 m_v3Rotation;
-	MyMesh* m_pMesh = nullptr;
-	String m_sProgrammer = "Alberto Bobadilla - labigm@rit.edu";
+
+	String m_sProgrammer = "Matthew Paseltiner - mjp3591@rit.edu";
 
 private:
 	static ImGuiObject gui; //GUI object
