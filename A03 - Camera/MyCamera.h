@@ -15,6 +15,8 @@ class MyCamera
 	vector3 m_v3Position = vector3(0.0f, 0.0f, 10.0f); //Where my camera is located
 	vector3 m_v3Target = vector3(0.0f, 0.0f, 0.0f); //What I'm looking at
 	vector3 m_v3Above = vector3(0.0f, 1.0f, 0.0f); //What is above the camera
+	vector3 m_v3Forward = m_v3Target - m_v3Position;
+	vector3 m_v3Orientation;
 
 	bool m_bPerspective = true; //perspective view? False is Orthographic
 
@@ -230,6 +232,14 @@ public:
 	OUTPUT: ---
 	*/
 	void MoveSideways(float a_fDistance = 0.1f);
+
+	//changes the rotation of the camera on the x axis
+	void ChangeYaw(float angleY);
+
+	//changes the rotations of the camera on the y axisa
+	void ChangePitch(float angleX);
+
+
 };
 
 } //namespace Simplex

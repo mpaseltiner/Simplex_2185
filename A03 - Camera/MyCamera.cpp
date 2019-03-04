@@ -158,5 +158,32 @@ void MyCamera::MoveForward(float a_fDistance)
 	m_v3Above += vector3(0.0f, 0.0f, -a_fDistance);
 }
 
-void MyCamera::MoveVertical(float a_fDistance){}//Needs to be defined
-void MyCamera::MoveSideways(float a_fDistance){}//Needs to be defined
+void MyCamera::MoveVertical(float a_fDistance)
+{
+	m_v3Position += vector3(0.0f, -a_fDistance, 0.0f);
+	m_v3Target += vector3(0.0f, -a_fDistance, 0.0f);
+	m_v3Above += vector3(0.0f, -a_fDistance, 0.0f);
+}//Needs to be defined
+void MyCamera::MoveSideways(float a_fDistance)
+{
+	m_v3Position += vector3(-a_fDistance, 0.0f, 0.0f);
+	m_v3Target += vector3(-a_fDistance, 0.0f, 0.0f);
+	m_v3Above += vector3(-a_fDistance, 0.0f, 0.0f);
+}//Needs to be defined
+
+
+void MyCamera::ChangeYaw(float angleY)
+{
+	quaternion q1 = glm::angleAxis(angleY, AXIS_Y);
+	m_v3Forward = m_v3Target - m_v3Position;
+	m_v3Orientation = m_v3Forward * q1;
+	m_v3Target = m_v3Position + m_v3Orientation;
+}
+
+void MyCamera::ChangePitch(float angleX)
+{
+	quaternion q1 = glm::angleAxis(angleX, glm::cross(m_v3Forward, m_v3Above));
+	m_v3Forward = m_v3Target - m_v3Position;
+	m_v3Orientation = m_v3Forward * q1;
+	m_v3Target = m_v3Position + m_v3Orientation;
+}
