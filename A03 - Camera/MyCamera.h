@@ -236,7 +236,7 @@ public:
 	//changes the rotation of the camera on the x axis
 	void ChangeYaw(float angleY);
 
-	//changes the rotations of the camera on the y axisa
+	//changes the rotations of the camera on the y axis
 	void ChangePitch(float angleX);
 
 

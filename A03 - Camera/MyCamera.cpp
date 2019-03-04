@@ -153,9 +153,9 @@ void Simplex::MyCamera::CalculateProjectionMatrix(void)
 void MyCamera::MoveForward(float a_fDistance)
 {
 	//The following is just an example and does not take in account the forward vector (AKA view vector)
-	m_v3Position += vector3(0.0f, 0.0f,-a_fDistance);
-	m_v3Target += vector3(0.0f, 0.0f, -a_fDistance);
-	m_v3Above += vector3(0.0f, 0.0f, -a_fDistance);
+	m_v3Position += glm::normalize(m_v3Forward) * a_fDistance;
+	m_v3Target += glm::normalize(m_v3Forward) * a_fDistance;
+	m_v3Above += glm::normalize(m_v3Forward) * a_fDistance;
 }
 
 void MyCamera::MoveVertical(float a_fDistance)
@@ -166,24 +166,27 @@ void MyCamera::MoveVertical(float a_fDistance)
 }//Needs to be defined
 void MyCamera::MoveSideways(float a_fDistance)
 {
-	m_v3Position += vector3(-a_fDistance, 0.0f, 0.0f);
-	m_v3Target += vector3(-a_fDistance, 0.0f, 0.0f);
-	m_v3Above += vector3(-a_fDistance, 0.0f, 0.0f);
+	m_v3Position += glm::normalize(glm::cross(m_v3Forward, AXIS_Y)) * a_fDistance;
+	m_v3Target += glm::normalize(glm::cross(m_v3Forward, AXIS_Y)) * a_fDistance;
+	m_v3Above += glm::normalize(glm::cross(m_v3Forward, AXIS_Y)) * a_fDistance;
 }//Needs to be defined
 
-
+//changes the rotation of the camera on the x axis
 void MyCamera::ChangeYaw(float angleY)
 {
 	quaternion q1 = glm::angleAxis(angleY, AXIS_Y);
 	m_v3Forward = m_v3Target - m_v3Position;
+	glm::normalize(m_v3Forward);
 	m_v3Orientation = m_v3Forward * q1;
 	m_v3Target = m_v3Position + m_v3Orientation;
 }
 
+//changes the rotations of the camera on the y axis
 void MyCamera::ChangePitch(float angleX)
 {
-	quaternion q1 = glm::angleAxis(angleX, glm::cross(m_v3Forward, m_v3Above));
+	quaternion q1 = glm::angleAxis(angleX, glm::cross(m_v3Forward, AXIS_Y));
 	m_v3Forward = m_v3Target - m_v3Position;
+	glm::normalize(m_v3Forward);
 	m_v3Orientation = m_v3Forward * q1;
 	m_v3Target = m_v3Position + m_v3Orientation;
 }
