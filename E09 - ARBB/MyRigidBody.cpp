@@ -87,6 +87,7 @@ void MyRigidBody::SetModelMatrix(matrix4 a_m4ModelMatrix)
 	//your code goes here---------------------
 	m_v3MinG = m_v3MinL;
 	m_v3MaxG = m_v3MaxL;
+	m_v3CenterG = static_cast<vector3>(m_m4ToWorld * vector4(m_v3Center, 1.0f));
 	//----------------------------------------
 
 	//we calculate the distance between min and max vectors
